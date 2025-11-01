@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard - Al's Auto</title>
+  <link rel="icon" href="img/alsauto.ico" />
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <div>
+        <h1>Admin Dashboard</h1>
+        <div id="userInfo" class="muted">Checking user...</div>
+      </div>
+      <div>
+        <button id="signOutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="section">
+      <h2>Admins</h2>
+      <div id="adminsList" aria-live="polite">
+        <div class="empty">Loading admins <span class="small-spinner" aria-hidden></span></div>
+      </div>
+    </div>
+
+    <!-- NEW: Bookings management -->
+    <div class="section">
+      <h2>Bookings</h2>
+
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+        <label class="muted" style="margin:0;">Filter:</label>
+        <select id="bookingFilter">
+          <option value="all">All</option>
+          <option value="pending" selected>Pending</option>
+          <option value="received">Received</option>
+          <option value="work_in_progress">Work in progress</option>
+          <option value="complete_repair">Complete repair</option>
+        </select>
+        
+        <div style="margin-left:auto;" id="bookingsCount" class="muted">—</div>
+      </div>
+
+      <div id="bookingsList" aria-live="polite">
+        <div class="empty">Loading bookings <span class="small-spinner" aria-hidden></span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

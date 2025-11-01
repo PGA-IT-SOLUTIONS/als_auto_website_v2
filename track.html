@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Track Vehicle Progress - Al's Auto</title>
+  <link rel="icon" type="image/png" href="img/alsauto.ico">
+  <link rel="stylesheet" href="track.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script type="module" src="track.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="img/alsauto_logo.png" alt="Al's Auto" style="height:64px; object-fit:contain;">
+      </div>
+      <a href="dashboard.html" class="back-btn" id="backBtn">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </header>
+
+    <main class="tracking-container" id="mainCard" role="main">
+      <div class="tracking-header">
+        <h1>Track Vehicle Progress</h1>
+        <p>Enter your tracking ID to check the status of your vehicle</p>
+      </div>
+
+      <form id="track-form" class="track-form" novalidate>
+        <div class="form-group">
+          <label for="tracking-id">Tracking ID</label>
+          <input type="text" id="tracking-id" name="tracking-id" placeholder="Enter your tracking ID or use link" autocomplete="off" required>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="submit" class="submit-btn" id="track-button">
+            <i class="fas fa-search"></i> Track Vehicle
+          </button>
+          <button type="button" id="clearBtn" class="submit-btn secondary" aria-label="Clear">Clear</button>
+        </div>
+      </form>
+
+      <div id="notification" class="notification" hidden></div>
+
+      <div id="result-area" class="result-area" aria-live="polite">
+        <!-- Booking result injected here -->
+      </div>
+    </main>
+  </div>
+</body>
+</html>

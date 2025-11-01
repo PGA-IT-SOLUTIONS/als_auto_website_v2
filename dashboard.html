@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Al's Auto</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="img/alsauto.ico">
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="dashboard.js" defer></script>
+</head>
+
+<body>
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <img src="img/alsauto_logo.png" alt="Al's Auto" class="logo">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="user-section">
+        <span class="welcome-text">Welcome, <span id="userName">User</span></span>
+        <button id="signOutButton" class="sign-out-btn" aria-label="Sign out">
+          <i class="fas fa-sign-out-alt"></i>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="container">
+      <div class="dashboard-card">
+        <h2>Welcome to Your Dashboard</h2>
+        <p>Your account has been successfully created and you are now logged in.</p>
+
+        <!-- Four action cards -->
+        <div class="cards-grid" role="list">
+          <button class="card-item" id="card-booking" role="listitem" aria-label="Booking">
+            <div class="card-icon"><i class="fas fa-calendar-plus"></i></div>
+            <div class="card-title">Booking</div>
+            <div class="card-desc">Create and view bookings</div>
+          </button>
+
+          <button class="card-item" id="card-track" role="listitem" aria-label="Track">
+            <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="card-title">Track</div>
+            <div class="card-desc">Track vehicle status</div>
+          </button>
+
+          <button class="card-item" id="card-invoice" role="listitem" aria-label="Invoice">
+            <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div class="card-title">Invoice</div>
+            <div class="card-desc">View invoices</div>
+          </button>
+
+          <button class="card-item" id="card-profile" role="listitem" aria-label="Manage profile">
+            <div class="card-icon"><i class="fas fa-user-cog"></i></div>
+            <div class="card-title">Manage Profile</div>
+            <div class="card-desc">Edit your profile & settings</div>
+          </button>
+        </div>
+
+        <div class="action-buttons" style="margin-top:18px">
+          <a href="index.html" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            Go to Homepage
+          </a>
+          
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

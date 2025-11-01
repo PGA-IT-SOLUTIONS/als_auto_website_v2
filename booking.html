@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bookings - Al's Auto</title>
+  <link rel="icon" type="image/png" href="img/alsauto.ico">
+  <link rel="stylesheet" href="booking.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="brand">
+      <img src="img/alsauto_logo.png" alt="Al's Auto" class="brand-logo">
+      <h1>Booking a Service</h1>
+    </div>
+    <div class="header-actions">
+      <a href="dashboard.html" class="btn small">← Back to dashboard</a>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <p class="user-info-note">Your account information has been pre-filled. No need to worry about filling in your details again.</p>
+
+    <form id="booking-form" class="card" aria-labelledby="booking-title">
+      <fieldset class="group">
+        <legend>New Booking</legend>
+
+      <div class="row">
+        <label>
+          Name:
+          <input type="text" id="name" name="name" required readonly>
+        </label>
+        <label>
+          Email:
+          <input type="email" id="email" name="email" required readonly>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>
+          Phone Number:
+          <input type="tel" id="phone" name="phone" required readonly>
+        </label>
+
+        <label class="date-input">
+          Preferred Date:
+          <input type="date" id="preferred" name="preferred" required>
+          
+        </label>
+      </div>
+
+      <div class="row">
+        <label>
+          Service Type:
+          <select id="service-type" name="service-type" required>
+            <option value="">Select Service</option>
+            <option value="minor-service">Minor Service</option>
+            <option value="major-service">Major Service</option>
+            <option value="vehicle-inspection">Vehicle Inspection</option>
+            <option value="mechanical-repair">Mechanical Repair</option>
+            <option value="electrical-repair">Electrical Repair</option>
+            <option value="other">Other/Specific Issue</option>
+          </select>
+        </label>
+
+        <!-- other service container id matches booking.js fallback -->
+        <label id="other-service-container" class="hidden">
+          Specify Issue:
+          <input type="text" id="other-service" name="other-service" placeholder="Describe your specific issue">
+        </label>
+      </div>
+
+      <h2 style="width:100%; margin-top: 18px; color:#2b728a; font-size:16px">Tell us About Your Vehicle</h2>
+
+      <div class="row">
+        <label>
+          Vehicle Make:
+          <input type="text" id="make" name="make" required>
+        </label>
+        <label>
+          Vehicle Model:
+          <input type="text" id="model" name="model" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label style="flex:1 1 100%">
+          Current Mileage in km:
+          <input type="text" id="mileage" name="mileage" required placeholder="Enter mileage (e.g., 45,000)">
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <!-- Important: IDs used by booking.js -->
+        <button type="submit" id="submitBtn" class="btn primary">
+          <span id="btnText">Submit Booking</span>
+        </button>
+      </div>
+      </fieldset>
+    </form>
+  </main>
+
+  <script type="module" src="booking.js" defer></script>
+</body>
+</html>
