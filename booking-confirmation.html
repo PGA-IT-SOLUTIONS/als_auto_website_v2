@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Booking Confirmation - Al's Auto</title>
+  <link rel="icon" href="img/alsauto.ico" />
+  <style>
+    :root{
+      --brand:#08417a;
+      --muted:#6b7280;
+      --card:#fff;
+      --bg:#f5f7fa;
+      --shadow:0 12px 40px rgba(7,18,39,0.06);
+      --border:#e6e9ef;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,system-ui,Arial;
+      background:linear-gradient(135deg,var(--bg),#eef3f8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      color:#0f172a;
+    }
+    .card{
+      width:720px;
+      max-width:100%;
+      background:var(--card);
+      border-radius:12px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+    }
+    h1{ margin:0; color:var(--brand); font-size:20px }
+    .subtitle{ color:var(--muted); margin-top:6px; font-size:14px }
+    .detail-row{ display:flex; gap:12px; margin-top:18px; align-items:center; flex-wrap:wrap }
+    .code {
+      font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+      background:#f3f6fb;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #e6eefc;
+      font-weight:700;
+      color:#062a4a;
+    }
+    .btn-row{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap }
+    button, a.button {
+      background:var(--brand);
+      color:#fff;
+      border:0;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    a.button.secondary{ background:transparent; color:var(--brand); border:1px solid var(--border) }
+    .mini { padding:8px 10px; font-weight:600; border-radius:8px }
+    .info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px }
+    .info-card{ background:#fbfdff; border-radius:10px; padding:12px; border:1px solid var(--border) }
+    .status-badge { display:inline-block; padding:8px 10px; border-radius:999px; font-weight:700; font-size:13px }
+    .s-pending{ background:#fff7ed; color:#ff9800; border:1px solid #ffd89a }
+    .s-received{ background:#eef7ff; color:#0b62a8; border:1px solid #cfe8ff }
+    .s-work{ background:#fff9ec; color:#b46b00; border:1px solid #ffdf9d }
+    .s-complete{ background:#e8f7ee; color:#068a27; border:1px solid #bfeac8 }
+    .muted{ color:var(--muted) }
+    pre { background:#fafafa; padding:12px; border-radius:8px; overflow:auto; border:1px solid #eee }
+    .note { margin-top:12px; color:var(--muted); font-size:13px }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <h1>Booking received</h1>
+    <div class="subtitle">We've saved your booking. Use the tracking code below to check progress.</div>
+
+    <div style="margin-top:24px; text-align:center;">
+      <div class="muted" style="margin-bottom:8px;">Tracking code</div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:16px">
+        <div id="trackingCode" class="code">—</div>
+        <button class="mini" id="copyBtn">Copy</button>
+      </div>
+      <div style="margin-bottom:8px">
+        <a id="dashboardLink" class="button secondary" href="dashboard.html">Back to Dashboard</a>
+      </div>
+      <div class="note">Keep this code safe it will be used to track the vehicle status.</div>
+    </div>
+
+    
+
+    
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // same firebase config as other pages
+    const firebaseConfig = {
+      apiKey: "AIzaSyAckRXgR-_vShOB5f6VVfN9Ls01Ql9aVnI",
+      authDomain: "alsauto-eeef4.firebaseapp.com",
+      projectId: "alsauto-eeef4",
+      storageBucket: "alsauto-eeef4.appspot.com",
+      messagingSenderId: "941750657381",
+      appId: "1:941750657381:web:4afd710b817bdb47fb418c",
+      measurementId: "G-42ZCLHYR29"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM
+    const trackingCodeEl = document.getElementById('trackingCode');
+    const copyBtn = document.getElementById('copyBtn');
+
+
+
+    // get bookingId from sessionStorage or URL
+    function getBookingFromSessionOrUrl(){
+      try {
+        const raw = sessionStorage.getItem('bookingConfirmation');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.id) return { id: parsed.id, payload: parsed };
+        }
+      } catch(e){ /* ignore */ }
+
+      // fallback to query param ?id=...
+      const url = new URL(location.href);
+      const id = url.searchParams.get('id');
+      if (id) return { id, payload: null };
+      return null;
+    }
+
+    const bookingRef = getBookingFromSessionOrUrl();
+    if (!bookingRef) {
+      trackingCodeEl.textContent = 'Not available';
+    } else {
+      trackingCodeEl.textContent = bookingRef.id;
+    }
+
+    if (copyBtn && trackingCodeEl) {
+      copyBtn.addEventListener('click', async () => {
+        const code = trackingCodeEl.textContent.trim();
+        try {
+          await navigator.clipboard.writeText(code);
+          copyBtn.textContent = 'Copied';
+          setTimeout(()=> copyBtn.textContent = 'Copy', 1500);
+        } catch(e){
+          alert('Copy failed — you can select and copy the code manually.');
+        }
+      });
+    }
+
+    // subscribe to Firestore booking doc to ensure tracking code stays updated (only if we have an id)
+    if (bookingRef && bookingRef.id && trackingCodeEl) {
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          return;
+        }
+
+        const docRef = doc(db, 'bookings', bookingRef.id);
+
+        // realtime updates
+        const unsub = onSnapshot(docRef, (snap) => {
+          if (!snap.exists()) {
+            return;
+          }
+          const data = snap.data();
+          // check ownership/admin: don't show if user is not owner and not admin (rules already block read)
+          // For friendly UX we check local uid against document userId
+          if (data.userId && data.userId !== user.uid) {
+            // still check if admin (quick)
+            // try to read admins doc to determine if admin
+            (async () => {
+              try {
+                const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+                if (!adminDoc.exists()) {
+                  trackingCodeEl.textContent = bookingRef.id;
+                  unsub(); // stop listening
+                  return;
+                }
+              } catch (err) {
+                console.error('admin check failed', err);
+              }
+            })();
+          }
+
+          // tracking code is already set, no other UI to update
+
+        }, (err) => {
+          console.error('booking snapshot error', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

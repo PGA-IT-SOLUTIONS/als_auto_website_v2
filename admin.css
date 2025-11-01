@@ -1,0 +1,40 @@
+/* admin.css - styles for admin-dashboard.html (keeps look consistent with login.css) */
+
+body { font-family: Inter, system-ui, Arial; background: linear-gradient(135deg,#f5f7fa 0,#e4e8f0 100%); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.card { width:820px; max-width:96%; background:#fff; border-radius:12px; padding:20px; box-shadow:0 12px 40px rgba(7,18,39,0.08); box-sizing:border-box; }
+header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+h1 { margin:0; color: #08417a; font-size:20px; }
+#userInfo { color:#374151; font-size:14px; }
+#signOutBtn { background:#d32f2f; color:#fff; border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600 }
+#signOutBtn:hover { opacity:0.95 }
+.section { margin-top:18px }
+.section h2 { font-size:16px; margin:0 0 10px 0; color:#0f172a }
+#adminsList { width:100%; border-radius:8px; border:1px solid #e5e7eb; padding:12px; background:#fbfdff; max-height:300px; overflow:auto }
+.admin-item { display:flex; justify-content:space-between; gap:12px; padding:10px; border-bottom:1px solid #eef2f6 }
+.admin-item:last-child { border-bottom: none }
+.admin-meta { color:#374151; font-size:13px }
+.muted { color:#6b7280; font-size:13px }
+.empty { text-align:center; color:#6b7280; padding:28px }
+/* small loader for list fetching */
+.small-spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(8,65,122,0.15); border-radius:50%; border-top-color:#08417a; animation:spin 1s linear infinite; vertical-align:middle; margin-right:8px }
+@keyframes spin { to { transform:rotate(360deg) } }
+
+/* optional responsive tweak */
+@media (max-width:720px){ .card{width:96%;padding:16px} #adminsList{max-height:240px} }
+
+/* bookings UI - updated statuses */
+.booking-item { display:flex; gap:12px; padding:12px 14px; border-bottom:1px solid #eef2f6; align-items:start; }
+.booking-item .badge { padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; display:inline-block; }
+.badge.pending { background:#fff7ed; color:#ff9800; border:1px solid #ffd89a; }
+.badge.received { background:#eef7ff; color:#0b62a8; border:1px solid #cfe8ff; }
+.badge.work { background:#fff9ec; color:#b46b00; border:1px solid #ffdf9d; } /* neutral worker color */
+.badge.complete { background:#e8f7ee; color:#068a27; border:1px solid #bfeac8; }
+
+.btn { border:1px solid transparent; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:600; background:#fff; }
+.btn.action-receive { background:#0b62a8; color:#fff; border-color: rgba(8,98,168,0.12); } /* received (blue) */
+.btn.action-start { background:#f59e0b; color:#fff; border-color: rgba(245,158,11,0.12); } /* start work (amber) */
+.btn.action-complete { background:#0b803b; color:#fff; border-color: rgba(11,128,59,0.12); } /* complete (green) */
+.btn.action-view { background:transparent; color:#08417a; border-color: rgba(8,65,122,0.06); }
+
+.btn:disabled { opacity:0.6; cursor:not-allowed; }
+

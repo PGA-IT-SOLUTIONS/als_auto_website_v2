@@ -1,0 +1,134 @@
+:root {
+  /* added brand variables to match login.css loader visuals */
+  --brand: #08417a;
+  --admin-brand: #602fd3;
+  --success: #0b803b;
+  --warning: #ff9800;
+
+  --primary: #08417a;
+  --primary-accent: #0a4d8c;
+  --muted: #6b7280;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e9eef6;
+  --shadow: 0 10px 30px rgba(7,18,39,0.06);
+  --info: #0b62a8;
+}
+
+/* basic reset */
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,Arial,Segoe UI,Roboto}
+
+/* page */
+body{ background: linear-gradient(135deg,var(--bg) 0,#eef3f8 100%); color:#0f172a; min-height:100vh; padding:20px; }
+.container{ max-width:1000px; margin:0 auto; }
+
+/* header */
+header{ display:flex; justify-content:space-between; align-items:center; padding:18px 0 12px; gap:12px; }
+.logo img{ display:block; height:64px; width:auto; }
+.back-btn{ text-decoration:none; background:var(--primary); color:#fff; padding:10px 14px; border-radius:8px; font-weight:600; display:inline-flex; gap:8px; align-items:center; }
+.back-btn:hover{ background:var(--primary-accent) }
+
+/* main card */
+.tracking-container{ background:var(--card-bg); border-radius:14px; padding:32px; box-shadow:var(--shadow); border:1px solid var(--border); margin-bottom:30px; }
+.tracking-header{ text-align:center; margin-bottom:22px }
+.tracking-header h1{ color:var(--primary); font-size:22px; margin-bottom:6px }
+.tracking-header p{ color:var(--muted); font-size:15px }
+
+/* form */
+.track-form{ display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:10px }
+.form-group{ width:100%; max-width:520px }
+.form-group label{ display:block; margin-bottom:8px; font-weight:600; color:#233447; }
+.form-group input{ width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); font-size:15px; background:#fff }
+.form-group input:focus{ outline:none; box-shadow:0 6px 18px rgba(11,98,168,0.06); border-color:var(--primary) }
+
+/* buttons */
+.submit-btn{ background:var(--primary); color:#fff; border:0; padding:12px 18px; border-radius:10px; cursor:pointer; font-weight:700 }
+.submit-btn.secondary{ background:transparent; color:var(--primary); border:1px solid var(--border) }
+.submit-btn:disabled{ opacity:0.6; cursor:not-allowed }
+
+/* notifications */
+.notification{ padding:12px 14px; border-radius:10px; margin-top:14px; text-align:center; display:block; }
+.notification.error{ background:#f8d7da; color:#721c24; border:1px solid #f5c6cb }
+.notification.info{ background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb }
+
+/* result */
+.result-area{ margin-top:18px }
+.result-card{ background:var(--card-bg); border-radius:12px; padding:20px; box-shadow:0 6px 18px rgba(7,18,39,0.04); border:1px solid var(--border) }
+.vehicle-info{ display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:14px; border-bottom:1px solid #eef2f6; padding-bottom:12px }
+.vehicle-details h2{ color:var(--primary); font-size:18px; margin-bottom:6px }
+.service-type{ color:var(--muted) }
+
+/* status */
+.status-container{ text-align:center }
+.status-label{ color:var(--muted); font-size:13px; margin-bottom:6px }
+.status-value{ display:inline-block; padding:8px 12px; border-radius:999px; font-weight:700; font-size:14px }
+.status-pending{ background:#fff7ed; color:var(--warning) }
+.status-received{ background:#e6f0ff; color:var(--info) }
+.status-progress{ background:#e9f7ee; color:var(--success) }
+.status-complete{ background:#e8f7ee; color:var(--success) }
+
+/* progress */
+.progress-bar{ height:10px; background:#eef2f6; border-radius:999px; overflow:hidden; margin:16px 0 }
+.progress-fill{ height:100%; background:var(--primary); width:0; transition:width .4s ease }
+
+/* steps */
+.progress-steps{ display:flex; justify-content:space-between; margin-top:12px; position:relative; gap:8px }
+.progress-step{ text-align:center; flex:1 }
+.step-icon{ width:34px; height:34px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#6b7280; margin-bottom:8px }
+.step-active .step-icon{ background:var(--primary); color:#fff }
+.step-label{ font-size:13px; color:#6b7280 }
+.step-active .step-label{ color:var(--primary); font-weight:700 }
+
+
+@media (max-width:720px){
+  .vehicle-info{ flex-direction:column; text-align:center }
+  .progress-steps{ gap:6px }
+}
+
+/* Overlay that centers the loader and dims the page */
+#global-loader-overlay {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+  z-index: 9999;
+}
+
+/* Keep pointer-events so clicks are blocked while loading */
+#global-loader-overlay.active {
+  pointer-events: auto;
+}
+
+/* Your original loader styles (slightly adapted to display nicely) */
+#global-loader-overlay .loader {
+  width: 60px;
+  aspect-ratio: 2; /* keeps loader shape */
+  --_g: no-repeat radial-gradient(circle closest-side,#fff 90%,#0000);
+  /* use white dots so it shows well on dark overlay; change to #000 if you want dark dots */
+  background:
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 50%;
+  animation: l3 1s infinite linear;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25));
+  border-radius: 8px;
+}
+@keyframes l3 {
+  20%{background-position:0%   0%, 50%  50%,100%  50%}
+  40%{background-position:0% 100%, 50%   0%,100%  50%}
+  60%{background-position:0%  50%, 50% 100%,100%   0%}
+  80%{background-position:0%  50%, 50%  50%,100% 100%}
+}
+
+/* Small loading text under the spinner (optional) */
+#global-loader-overlay .loader-text {
+  margin-top: 12px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
