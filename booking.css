@@ -71,15 +71,11 @@ body{
 .form-actions{ text-align:center; margin-top:8px }
 
 
-/* large 3-dot loader (adapted from your snippet) */
-/* HTML injected: <div class="loader"></div> */
-
 /* Responsive */
 @media (max-width:900px){
   .row label{ flex:1 1 100% }
   .page-main{ padding:0 14px 40px }
 }
-/* Loader overlay — using the same styles as login.css (replace existing loader block) */
 
 /* Overlay that centers the loader and dims the page */
 #global-loader-overlay {
@@ -103,12 +99,11 @@ body{
   z-index: 9999;
 }
 
-/* Your original loader styles (slightly adapted to display nicely) */
+
 #global-loader-overlay .loader {
   width: 60px;
   aspect-ratio: 2; /* keeps loader shape */
   --_g: no-repeat radial-gradient(circle closest-side,#fff 90%,#0000);
-  /* use white dots so it shows well on dark overlay; change to #000 if you want dark dots */
   background:
     var(--_g) 0%   50%,
     var(--_g) 50%  50%,

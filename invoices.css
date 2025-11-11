@@ -1,0 +1,135 @@
+:root{
+  --brand:#08417a;
+  --accent:#0b803b;
+  --muted:#6b7280;
+  --bg:linear-gradient(135deg,#f5f7fa 0,#e9edf4 100%);
+  --card:#fff;
+  --border:#e6e9ef;
+  --shadow:0 8px 28px rgba(7,18,39,0.06);
+  --success:#0b803b;
+  --danger:#d32f2f;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial,Segoe UI,Roboto;
+  background:var(--bg);
+  color:#0f172a;
+  -webkit-font-smoothing:antialiased;
+  padding:20px;
+}
+
+.page{ max-width:1100px; margin:0 auto; }
+
+.page-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+.brand-logo{ height:48px; width:auto; display:block; }
+.header-actions{ display:flex; gap:12px; align-items:center; }
+
+/* Card */
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:18px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+}
+
+/* header inside main card */
+.page-main h2{ margin:0; color:var(--brand); font-size:18px; }
+
+/* invoices list */
+.invoices-list{ margin-top:14px; display:flex; flex-direction:column; gap:12px; }
+.invoice-item{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #eef3f8;
+  background:#fff;
+}
+.invoice-left{ display:flex; gap:12px; align-items:center; flex:1; min-width:0; }
+.invoice-meta{ min-width:0; }
+.invoice-meta h3{ margin:0; font-size:15px; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.invoice-meta .small{ color:var(--muted); font-size:13px; margin-top:6px; display:block; }
+.invoice-right{ text-align:right; min-width:200px }
+
+/* badges */
+.badge{ padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; display:inline-block; }
+.badge.paid{ background:#e6f7ee; color:var(--success); border:1px solid rgba(11,128,59,0.08); }
+.badge.unpaid{ background:#fff4f4; color:var(--danger); border:1px solid rgba(211,47,47,0.06); }
+
+/* buttons */
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:0; cursor:pointer; text-decoration:none; background:var(--brand); color:#fff; font-weight:700; }
+.btn.small{ padding:8px 10px; font-size:14px; background:transparent; color:var(--brand); border:1px solid var(--border); }
+.btn.view{ background:transparent; color:var(--brand); border:1px solid var(--border); padding:8px 10px; border-radius:8px; }
+.btn.pay{ background:var(--accent); }
+
+/* empty state */
+.empty{ color:var(--muted); padding:18px; text-align:center; }
+
+/* small spinner */
+.small-spinner{ display:inline-block; width:12px; height:12px; border:2px solid rgba(8,65,122,0.15); border-top-color:var(--brand); border-radius:50%; animation:spin 1s linear infinite; vertical-align:middle; margin-left:6px; }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+
+/* responsive */
+@media (max-width:720px){
+  .invoice-right{ min-width:120px; text-align:left; margin-top:8px; }
+  .invoice-item{ flex-direction:column; align-items:flex-start; }
+}
+
+/* Loader overlay - matches login/booking */
+#global-loader-overlay {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+  z-index: 9999;
+}
+
+/* Keep pointer-events so clicks are blocked while loading */
+#global-loader-overlay.active {
+  pointer-events: auto;
+}
+
+/* Your original loader styles (slightly adapted to display nicely) */
+#global-loader-overlay .loader {
+  width: 60px;
+  aspect-ratio: 2; /* keeps loader shape */
+  --_g: no-repeat radial-gradient(circle closest-side,#fff 90%,#0000);
+  /* use white dots so it shows well on dark overlay; change to #000 if you want dark dots */
+  background:
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 50%;
+  animation: l3 1s infinite linear;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25));
+  border-radius: 8px;
+}
+@keyframes l3 {
+  20%{background-position:0%   0%, 50%  50%,100%  50%}
+  40%{background-position:0% 100%, 50%   0%,100%  50%}
+  60%{background-position:0%  50%, 50% 100%,100%   0%}
+  80%{background-position:0%  50%, 50%  50%,100% 100%}
+}
+
+/* Small loading text under the spinner (optional) */
+#global-loader-overlay .loader-text {
+  margin-top: 12px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+

@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Invoice View</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="img/als icon.png" />
+  <style>
+    :root{
+      --brand:#08417a;
+      --muted:#666;
+      --pad:18px;
+      font-family:Inter,system-ui,Arial;
+    }
+    html,body{height:100%;margin:0}
+    body{background:#f7fafc;color:#111;font-family:Inter,system-ui,Arial;padding:20px}
+
+    /* Container */
+    .container{max-width:980px;margin:20px auto;background:#fff;border-radius:8px;padding:20px;box-shadow:0 6px 18px rgba(12,15,20,0.06)}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .logo img{max-width:180px;height:auto}
+    .company-info{text-align:right}
+    h2{color:var(--brand);margin:12px 0}
+    .meta{color:var(--muted);font-size:13px}
+    .section{margin-top:18px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    thead th{background:#fafafa;text-align:left;padding:10px;border-bottom:1px solid #eee;font-size:13px}
+    td,th{padding:10px;border-bottom:1px solid #f6f8fb}
+    .right{text-align:right}
+    .totals{display:flex;justify-content:flex-end;margin-top:12px;gap:10px}
+    .totals .box{min-width:260px;padding:12px;border:1px solid #f1f4f8;border-radius:6px;background:#fff}
+    .small{font-size:13px;color:var(--muted)}
+    .controls{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+    button{cursor:pointer;padding:8px 12px;border-radius:6px;border:1px solid #ddd;background:#fff}
+    pre{white-space:pre-wrap;background:#fafafa;padding:12px;border-radius:6px;border:1px dashed #eee}
+
+    /* ===== global loader overlay (matches system) ===== */
+    #global-loader-overlay{
+      position: fixed;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(15,23,42,0.38);
+      z-index: 9999;
+    }
+    #global-loader-overlay .loader-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      padding:22px 26px;
+      border-radius:12px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.3);
+      min-width:220px;
+      max-width:90%;
+    }
+
+    /* subtle animated three-dot loader */
+    #global-loader-overlay .loader {
+      width:72px;
+      height:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    #global-loader-overlay .loader span {
+      display:block;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:#fff;
+      opacity:0.85;
+      transform: translateY(0);
+      animation: loader-bounce 900ms infinite ease-in-out;
+    }
+    #global-loader-overlay .loader span:nth-child(2){ animation-delay: 120ms; }
+    #global-loader-overlay .loader span:nth-child(3){ animation-delay: 240ms; }
+
+    @keyframes loader-bounce {
+      0% { transform: translateY(0); opacity: .6; }
+      40% { transform: translateY(-8px); opacity: 1; }
+      80% { transform: translateY(0); opacity: .6; }
+      100% { transform: translateY(0); opacity: .6; }
+    }
+
+    #global-loader-overlay .loader-text {
+      color: #fff;
+      font-weight:700;
+      font-size:14px;
+      text-align:center;
+    }
+
+    /* hide invoice content until loaded */
+    #invoice { display:none; }
+
+    /* responsive tweaks */
+    @media (max-width:640px){
+      .container{margin:12px;padding:16px}
+      #global-loader-overlay .loader { width:60px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader overlay (visible while loading) -->
+  <div id="global-loader-overlay" role="status" aria-live="polite">
+    <div class="loader-wrap">
+      <div class="loader" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div id="loaderText" class="loader-text">Loading invoice...</div>
+    </div>
+  </div>
+
+  <div class="container" id="root">
+    <div id="invoice">
+      <div class="header">
+        <div class="logo">
+          <img src="img/ALS AUTO.png" alt="Company logo" id="companyLogo" />
+        </div>
+        <div class="company-info">
+          <div style="font-weight:700;color:var(--brand);">ALS Auto Services</div>
+          <div class="meta">34a Central Avenue, Eastleigh, Edenvale<br/>Phone: +27 073 299 2009
+                <br/>allwynsewell@gmail.com</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Invoice</h2>
+        <div class="small">Invoice ID: <span id="invId"></span> &nbsp;•&nbsp; Created: <span id="invCreated"></span></div>
+      </div>
+
+      <div class="section" id="customerSection">
+        <h3>Customer / Account</h3>
+        <div id="customerInfo" class="small"></div>
+      </div>
+
+      <div class="section" id="bookingSection">
+        <h3>Booking & Vehicle</h3>
+        <div id="bookingInfo" class="small"></div>
+      </div>
+
+      <div class="section" id="itemsSection">
+        <h3>Work / Items</h3>
+        <table id="itemsTable" role="table">
+          <thead>
+            <tr><th style="width:60%">Description</th><th style="width:15%">Quantity</th><th style="width:12%" class="right">Cost per Unit</th><th style="width:13%" class="right">Price (R)</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="section totalsWrap">
+        <div class="totals">
+          <div class="box">
+            <div style="display:flex;justify-content:space-between"><span>Subtotal</span><strong id="subtotalVal"></strong></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px"><span>VAT</span><strong id="taxVal"></strong></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:16px"><span>Total</span><strong id="totalVal"></strong></div>
+            <div style="margin-top:10px" class="small">Paid: <span id="paidBadge"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="notesSection" style="display:none">
+        <h3>Notes</h3>
+        <div id="notesText" class="small"></div>
+      </div>
+
+      <div class="section" id="creatorSection" style="margin-top:18px">
+        <div class="small">Created by: <span id="createdBy"></span> &nbsp;•&nbsp; Updated: <span id="updatedAt"></span></div>
+      </div>
+
+      <div class="controls">
+        <button id="backBtn">Back</button>
+        <button id="printBtn">Print</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase libs -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+    import {
+      getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, limit, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js';
+
+    // config (same as other files)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAckRXgR-_vShOB5f6VVfN9Ls01Ql9aVnI",
+      authDomain: "alsauto-eeef4.firebaseapp.com",
+      projectId: "alsauto-eeef4",
+      storageBucket: "alsauto-eeef4.appspot.com",
+      messagingSenderId: "941750657381",
+      appId: "1:941750657381:web:4afd710b817bdb47fb418c",
+      measurementId: "G-42ZCLHYR29"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM refs (loader overlay + text)
+    const loaderOverlay = document.getElementById('global-loader-overlay');
+    const loaderText = document.getElementById('loaderText');
+    const invoiceWrap = document.getElementById('invoice');
+    const invIdEl = document.getElementById('invId');
+    const invCreatedEl = document.getElementById('invCreated');
+    const customerInfoEl = document.getElementById('customerInfo');
+    const bookingInfoEl = document.getElementById('bookingInfo');
+    const itemsTbody = document.querySelector('#itemsTable tbody');
+    const subtotalVal = document.getElementById('subtotalVal');
+    const taxVal = document.getElementById('taxVal');
+    const totalVal = document.getElementById('totalVal');
+    const paidBadge = document.getElementById('paidBadge');
+    const notesSection = document.getElementById('notesSection');
+    const notesText = document.getElementById('notesText');
+    const createdByEl = document.getElementById('createdBy');
+    const updatedAtEl = document.getElementById('updatedAt');
+
+    // small util
+    function param(name='invoiceId'){
+      try { return new URL(location.href).searchParams.get(name); } catch(e) { return null; }
+    }
+    function fmtMoney(n=0){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function fmtDate(ts){
+      if(!ts) return '';
+      try { if (ts.toDate) return ts.toDate().toLocaleString(); return new Date(ts).toLocaleString(); } catch(e){ return String(ts); }
+    }
+
+    // Require admin login (same guard pattern as elsewhere)
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // redirect to login if not signed in
+        loaderText.textContent = 'Not signed in. Redirecting...';
+        setTimeout(()=> window.location.replace('login.html'), 900);
+        return;
+      }
+
+      try {
+        // optional: verify admin exists in admins collection
+        const adm = await getDoc(doc(db,'admins',user.uid));
+        if (!adm.exists()) {
+          // not an admin -> sign out and redirect
+          await signOut(auth);
+          loaderText.textContent = 'Not authorized. Redirecting...';
+          setTimeout(()=> window.location.replace('dashboard.html'), 900);
+          return;
+        }
+      } catch (err) {
+        console.error('admin check fail', err);
+        await signOut(auth);
+        loaderText.textContent = 'Auth check failed. Redirecting...';
+        setTimeout(()=> window.location.replace('login.html'), 900);
+        return;
+      }
+
+      // proceed to load invoice
+      await loadAndRenderInvoice();
+    });
+
+    async function loadAndRenderInvoice(){
+      const invoiceId = param('invoiceId');
+      if (!invoiceId) {
+        loaderText.textContent = 'Invoice ID missing in URL.';
+        return;
+      }
+
+      loaderText.textContent = 'Loading invoice...';
+      try {
+        const invRef = doc(db, 'invoices', invoiceId);
+        const invSnap = await getDoc(invRef);
+        if (!invSnap.exists()) {
+          loaderText.textContent = 'Invoice not found.';
+          return;
+        }
+        const inv = invSnap.data();
+
+        // Show basic invoice meta
+        invIdEl.textContent = invoiceId;
+        invCreatedEl.textContent = fmtDate(inv.createdAt);
+
+        // Customer / account info (from invoice.customer)
+        const cust = inv.customer || {};
+        const customerHtml = `
+          <div><strong>Name:</strong> ${escapeHtml(cust.name || '—')}</div>
+          <div><strong>Email:</strong> ${escapeHtml(cust.email || '—')}</div>
+          <div><strong>Phone:</strong> ${escapeHtml(cust.phone || '—')}</div>
+        `;
+        customerInfoEl.innerHTML = customerHtml;
+
+        // Booking info: if invoice.bookingRef exists, fetch booking doc (gives access to userId, preferredDate, vehicle, etc.)
+        let bookingHtml = '';
+        if (inv.bookingRef && typeof inv.bookingRef.get === 'function') {
+          // it's a DocumentReference object
+          const bookingSnap = await getDoc(inv.bookingRef);
+          if (bookingSnap.exists()) {
+            const b = bookingSnap.data();
+            bookingHtml = `
+              <div><strong>Booking ID:</strong> ${bookingSnap.id}</div>
+              <div><strong>Vehicle:</strong> ${escapeHtml(b.vehicleMake || '')} ${escapeHtml(b.vehicleModel || '')}</div>
+              <div><strong>Service:</strong> ${escapeHtml(b.serviceType || '')} ${b.otherService ? ' — ' + escapeHtml(b.otherService) : ''}</div>
+              <div><strong>Preferred date:</strong> ${escapeHtml(b.preferredDateString || fmtDate(b.preferredDate))}</div>
+              <div><strong>User ID:</strong> ${escapeHtml(b.userId || '—')}</div>
+              <div><strong>User email (booking):</strong> ${escapeHtml(b.userEmail || '—')}</div>
+            `;
+          } else {
+            bookingHtml = `<div class="small">Booking reference exists but document is missing.</div>`;
+          }
+        } else {
+          // fallback: invoice.bookingId or invoice.bookingRef as id string
+          const bookingId = inv.bookingId || (inv.bookingRef && inv.bookingRef.id) || '';
+          bookingHtml = `<div><strong>Booking ID:</strong> ${escapeHtml(bookingId || '—')}</div>
+                         <div class="small">Booking details unavailable.</div>`;
+        }
+        bookingInfoEl.innerHTML = bookingHtml;
+
+        // Items
+        itemsTbody.innerHTML = '';
+        const items = inv.items || [];
+        for (const it of items) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(it.description || '')}</td>
+            <td>${Number(it.qty || 0)}</td>
+            <td class="right">${fmtMoney(it.unit || 0)}</td>
+            <td class="right">${fmtMoney(it.lineTotal || 0)}</td>
+          `;
+          itemsTbody.appendChild(tr);
+        }
+
+        // Totals & notes & paid
+        subtotalVal.textContent = fmtMoney(inv.subtotal || 0);
+        taxVal.textContent = fmtMoney(inv.taxAmount || 0);
+        totalVal.textContent = fmtMoney(inv.total || 0);
+        paidBadge.textContent = inv.paid ? 'Yes' : 'No';
+
+        if (inv.notes) {
+          notesText.textContent = inv.notes;
+          notesSection.style.display = 'block';
+        } else {
+          notesSection.style.display = 'none';
+        }
+
+        // Created by / updated
+        if (inv.createdBy) {
+          // attempt to fetch admin profile
+          try {
+            const adminSnap = await getDoc(doc(db, 'admins', inv.createdBy));
+            const adminData = adminSnap.exists() ? adminSnap.data() : null;
+            createdByEl.textContent = adminData ? (adminData.email || inv.createdBy) : inv.createdBy;
+          } catch(e) {
+            createdByEl.textContent = inv.createdBy;
+          }
+        } else {
+          createdByEl.textContent = '—';
+        }
+        updatedAtEl.textContent = fmtDate(inv.updatedAt);
+
+        // Done — hide overlay and show invoice
+        loaderOverlay.style.display = 'none';
+        invoiceWrap.style.display = 'block';
+
+      } catch (err) {
+        console.error('load invoice error', err);
+        loaderText.textContent = 'Failed to load invoice. Check console for details.';
+      }
+    }
+
+    // helpers
+    function escapeHtml(s=''){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    // buttons
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+    document.getElementById('backBtn').addEventListener('click', () => window.close());
+  </script>
+</body>
+</html>
