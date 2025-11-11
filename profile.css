@@ -1,0 +1,198 @@
+/* profile.css - centered professional profile page (based on booking.css) */
+
+/* color system */
+:root{
+    --brand: #08417a;
+    --accent: #0b803b;
+    --muted: #6b7280;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --shadow: 0 10px 30px rgba(7,18,39,0.07);
+    --border: #e6e9ef;
+    --danger:#d32f2f;
+    --text: #0f2a16;
+    --radius: 12px;
+    --max-width: 920px;
+  }
+  
+  /* base */
+  * { box-sizing: border-box; }
+  html,body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text);
+    background: linear-gradient(135deg,#f5f7fa 0,#e9edf4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+  }
+  
+  /* wrapper */
+  .page-wrapper {
+    width: 100%;
+    max-width: var(--max-width);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+  }
+  
+  /* header */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 14px;
+  }
+  .brand { display:flex; gap:12px; align-items:center; }
+  .brand-logo { height:48px; width:auto; display:block; }
+  .page-header h1 {
+    margin: 0;
+    color: var(--brand);
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+    flex: 1 1 auto;
+  }
+  .header-actions .btn.small {
+    padding:8px 12px;
+    border-radius:10px;
+    background: var(--brand);
+    color: #fff;
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 6px 18px rgba(8,65,122,0.06);
+    font-weight:700;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  /* main */
+  .page-main {
+    width: 100%;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .user-info-note { text-align:center; color:var(--muted); font-size:14px; }
+  
+  /* card */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin: 0 auto 12px;
+    width: 100%;
+  }
+  
+  /* profile header */
+  .profile-header {
+    display:flex;
+    gap:18px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .profile-img-container { width:96px; height:96px; flex:0 0 96px; display:flex; align-items:center; justify-content:center; }
+  .profile-img {
+    width:88px; height:88px;
+    border-radius:50%;
+    background: linear-gradient(180deg,#fff,#f3f6f9);
+    display:flex; align-items:center; justify-content:center;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(7,18,39,0.04);
+    font-size: 36px; color: var(--muted);
+  }
+  .profile-info h1 { margin: 0 0 6px; font-size: 20px; color: var(--brand); font-weight: 800; }
+  .profile-info p { margin: 0; color: var(--muted); font-size: 14px; }
+  
+  /* fieldset + labels */
+  .group { border: 0; margin-bottom: 12px; padding: 0; }
+  .section-title { font-weight:700; color:var(--brand); margin-bottom:12px; display:block; }
+  
+  /* rows */
+  .row { display:flex; flex-wrap:wrap; gap:14px; align-items:stretch; margin-bottom:12px; }
+  .row label { flex:1 1 calc(50% - 14px); display:flex; flex-direction:column; gap:8px; min-width:220px; font-size:14px; color:#233447; }
+  .label-title { font-size:13px; color:var(--muted); font-weight:600; }
+  .row label input, .row label select {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 15px;
+    background: #fff;
+    transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
+  }
+  .row label input::placeholder { color: #9aa4b0; }
+  .row label input[readonly] { background: #f6f8fb; color: var(--muted); }
+  .row label input:focus, .row label select:focus {
+    outline: none;
+    box-shadow: 0 10px 30px rgba(8,65,122,0.06);
+    border-color: rgba(8,65,122,0.12);
+    transform: translateY(-1px);
+  }
+  
+  /* large single field on small screens */
+  @media (max-width:720px) {
+    .row label { flex:1 1 100%; }
+    .page-wrapper { padding: 0 8px; }
+  }
+  
+  /* buttons */
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:10px 16px; border-radius:10px; cursor:pointer; border:0; text-decoration:none; font-weight:700; font-size:15px; transition: transform .08s ease, box-shadow .12s ease; }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--brand); color: #fff; border: 2px solid rgba(8,122,65,0.06); box-shadow: 0 8px 20px rgba(8,65,122,0.08); padding:12px 20px; border-radius: 999px; }
+  .btn.primary:hover { background: var(--accent); }
+  .btn.secondary { background:#fff; border:1px solid var(--border); color:var(--brand); padding:10px 16px; }
+  
+  /* actions center */
+  .form-actions { display:flex; justify-content:center; gap:12px; margin-top:8px; }
+  
+  /* notification */
+  .notification { display:none; padding:12px 14px; border-radius:10px; margin:12px auto; max-width:var(--max-width); font-weight:700; font-size:14px; text-align:center; }
+  .notification.info { background:#ebf8ff; color:#0369a1; border:1px solid #bae6fd; }
+  .notification.success { background:#ecfdf5; color:#065f46; border:1px solid #bbf7d0; }
+  .notification.error { background:#fff1f2; color:#b91c1c; border:1px solid #fecaca; }
+  
+  /* loader overlay */
+  #global-loader-overlay {
+    position: fixed;
+    inset: 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(15,23,42,0.38);
+    z-index: 9999;
+  }
+  #global-loader-overlay .loader {
+    width: 72px;
+    height: 36px;
+    --_g: no-repeat radial-gradient(circle closest-side,#fff 90%,#0000);
+    background:
+      var(--_g) 0%   50%,
+      var(--_g) 50%  50%,
+      var(--_g) 100% 50%;
+    background-size: calc(100%/3) 50%;
+    animation: l3 1s infinite linear;
+    filter: drop-shadow(0 8px 26px rgba(0,0,0,0.20));
+    border-radius: 10px;
+  }
+  @keyframes l3 {
+    20%{background-position:0%   0%, 50%  50%,100%  50%}
+    40%{background-position:0% 100%, 50%   0%,100%  50%}
+    60%{background-position:0%  50%, 50% 100%,100%   0%}
+    80%{background-position:0%  50%, 50%  50%,100% 100%}
+  }
+  #global-loader-overlay .loader-text { margin-top:12px; color:#fff; font-weight:700; font-size:14px; text-align:center; }
+  
+  /* accessible focus outlines */
+  a:focus, button:focus, input:focus, select:focus { outline: 3px solid rgba(8,65,122,0.12); outline-offset:2px; }
+  
+  
+  

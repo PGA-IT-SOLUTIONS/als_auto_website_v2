@@ -29,12 +29,53 @@ h1 { margin:0; color: #08417a; font-size:20px; }
 .badge.received { background:#eef7ff; color:#0b62a8; border:1px solid #cfe8ff; }
 .badge.work { background:#fff9ec; color:#b46b00; border:1px solid #ffdf9d; } /* neutral worker color */
 .badge.complete { background:#e8f7ee; color:#068a27; border:1px solid #bfeac8; }
+.badge.invoice {background: #e8f7ee; color: #068a27;  border: 1px solid #bfeac8; }   
+/* Match other badge shapes and spacing */
+.badge.paid,
+.badge.unpaid {
+  padding: 6px 10px;
+  border-radius: 999px;      
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-block;
+}
+.badge.paid {
+  background: #e8f7ee;
+  color: #068a27;
+  border: 1px solid #bfeac8;
+}
+
+.badge.unpaid {
+  background: #fdecea;
+  color: #d32f2f;
+  border: 1px solid #f5c2c0;
+}
+
 
 .btn { border:1px solid transparent; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:600; background:#fff; }
 .btn.action-receive { background:#0b62a8; color:#fff; border-color: rgba(8,98,168,0.12); } /* received (blue) */
 .btn.action-start { background:#f59e0b; color:#fff; border-color: rgba(245,158,11,0.12); } /* start work (amber) */
 .btn.action-complete { background:#0b803b; color:#fff; border-color: rgba(11,128,59,0.12); } /* complete (green) */
 .btn.action-view { background:transparent; color:#08417a; border-color: rgba(8,65,122,0.06); }
+.btn.action-invoice {background: #fff7ed;color: #b46b00;border: 1px solid #ffd89a; }
+     
+
+.btn.action-paid {
+    background: #e8f7ee;
+  color: #068a27;
+  border: 1px solid #bfeac8;
+  }
+  
+  .btn.action-notpaid {
+    background: #fdecea;
+  color: #d32f2f;
+  border: 1px solid #f5c2c0;
+  }
+  
+  .btn.action-view-inv {
+    background:#eef7ff; color:#0b62a8; border:1px solid #cfe8ff;
+  }
 
 .btn:disabled { opacity:0.6; cursor:not-allowed; }
+
 

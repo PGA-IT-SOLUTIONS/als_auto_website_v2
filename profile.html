@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title> My Profile — ALS Auto</title>
+  <link rel="stylesheet" href="profile.css">
+  <link rel="icon" type="image/x-icon" href="img/alsauto.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://kit.fontawesome.com/a2e0e6ad57.js" crossorigin="anonymous"></script>
+  
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <header class="page-header">
+      <div class="brand">
+        <img src="img/alsauto_logo.png" alt="ALS Auto" class="brand-logo">
+      </div>
+
+      <h1>My Profile</h1>
+
+      <div class="header-actions">
+        <a class="btn small" href="dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </header>
+
+    <main class="page-main">
+      <div class="user-info-note">Update your contact details so we can reach you about bookings and invoices. Please note that if you wish to change your email please contact support at support@alsauto.com</div>
+
+      <!-- notifications -->
+      <div id="notification" class="notification" aria-live="polite" style="display:none"></div>
+
+      <!-- centered card -->
+      <div class="card profile-card">
+        <div class="profile-header">
+          <div class="profile-img-container">
+            <div class="profile-img" id="profile-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+
+          <div class="profile-info">
+            <h1 id="user-name">Loading...</h1>
+            <p id="user-email">Loading...</p>
+          </div>
+        </div>
+
+        <form id="profile-form" autocomplete="off" novalidate>
+          <fieldset class="group">
+            <legend class="section-title">Personal information</legend>
+
+            <div class="row">
+              <label>
+                <span class="label-title">First name</span>
+                <input id="name" name="name" type="text" placeholder="First name" readonly>
+              </label>
+
+              <label>
+                <span class="label-title">Surname</span>
+                <input id="surname" name="surname" type="text" placeholder="Surname" readonly>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                <span class="label-title">Email</span>
+                <input id="email" name="email" type="email" placeholder="you@domain.com" readonly>
+              </label>
+
+              <label>
+                <span class="label-title">Phone number</span>
+                <input type="tel" id="phone" name="phone" placeholder="123-456-7890" inputmode="tel" pattern="\\d{3}-\\d{3}-\\d{4}" maxlength="12" required>
+              </label>
+            </div>
+
+            <div class="row">
+              <label style="flex:1 1 100%">
+                <span class="label-title">Preferred communication</span>
+                <select id="communication" name="communication" required>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone Call</option>
+                  <option value="sms">SMS/Text Message</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button id="save-btn" class="btn primary" type="submit">Save changes</button>
+            <button id="cancel-btn" type="button" class="btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  
+  <script type="module" src="profile.js"></script>
+</body>
+</html>
