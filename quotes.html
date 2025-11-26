@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quotes</title>
+  <link rel="stylesheet" href="quote.css">
+  <link rel="icon" type="image/x-icon" href="img/alsauto.ico">
+  <script src="quote.js" defer></script>
+</head>
+<body>
+  <header class="main-header">
+    <!-- Hamburger now on the left -->
+    <button class="hamburger" id="hamburger" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Logo -->
+    <a href="index.html" class="brand" aria-label="Home">
+      <img src="img/alsauto_logo.png" alt="ALS AUTO Logo" class="logo">
+    </a>
+
+    <!-- Navigation -->
+    <nav id="main-nav" class="main-nav" aria-hidden="true">
+      <ul>
+        <li><a href="index.html" class="nav-link">Services</a></li>
+        <li><a href="index.html" class="nav-link">About Us</a></li>
+        <li><a href="index.html" class="nav-link">Contact</a></li>
+        <li><a href="quotes.html" class="nav-link"> Get a Quote</a></li>
+        <li><a href="login.html" class="nav-link">Sign In</a></li>
+        
+        
+  
+      </ul>
+    </nav>
+    <body>
+        
+</header>
+
+<div class="page-header">
+    <h1>Looking for a quote for your vehicle?</h1>
+    <p>Fill out the form below to receive a quote for your vehicle service. We'll contact you using the email you provide.</p>
+  </div>
+<main class="card" role="main">
+<form id="quote-form" novalidate>
+<div class="form-grid">
+<div class="field">
+<label for="q-name">First name</label>
+<input id="q-name" name="name" type="text" required placeholder="John">
+</div>
+
+
+<div class="field">
+<label for="q-surname">Surname</label>
+<input id="q-surname" name="surname" type="text" required placeholder="Doe">
+</div>
+
+
+<div class="field">
+<label for="q-make">Vehicle Make</label>
+<input id="q-make" name="make" type="text" required placeholder="Toyota">
+</div>
+
+
+<div class="field">
+<label for="q-model">Vehicle Model & Year</label>
+<input id="q-model" name="model" type="text" required placeholder="Corolla 2018">
+</div>
+
+
+<div class="field">
+<label for="service-type">Type of service you're Requesting a Quote for</label>
+<select id="service-type" name="service-type" required>
+<option value="">Select service</option>
+<option value="minor-service">Minor Service</option>
+<option value="major-service">Major Service</option>
+<option value="vehicle-inspection">Vehicle Inspection</option>
+<option value="mechanical-repair">Mechanical Repair</option>
+<option value="electrical-repair">Electrical Repair</option>
+<option value="other">Other / Specific issue</option>
+</select>
+
+<div class="field" id="other-service-field" style="display:none;margin-top:8px;">
+    <label for="other-service">Describe the Specific Issue</label>
+    <input id="other-service" name="other-service" type="text" placeholder="Describe the specific issue" style="border-radius:8px;padding:10px;border:1px solid #e6eef5;background:#f5f7fb;">
+</div>
+
+<script>
+(function(){
+    var select = document.getElementById('service-type');
+    var field = document.getElementById('other-service-field');
+    var input = document.getElementById('other-service');
+
+    function toggleOther(){
+        var show = select && select.value === 'other';
+        if(field) field.style.display = show ? 'block' : 'none';
+        if(input) input.required = show;
+    }
+
+    if(select){
+        select.addEventListener('change', toggleOther);
+        // initialize in case a value is already selected
+        toggleOther();
+    }
+})();
+</script>
+</div>
+
+
+<div class="field">
+<label for="q-email">Contact Email Address</label>
+<input id="q-email" name="email" type="email" required placeholder="you@example.com">
+
+</div>
+
+
+<div class="field">
+<label>&nbsp;</label>
+<div>
+<button type="submit" class="btn">Request Quote</button>
+
+</div>
+</form>
+</main>
+</body>
+</html>

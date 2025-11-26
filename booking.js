@@ -43,6 +43,24 @@ const mileageInput = document.getElementById('mileage');
 let submitBtn = document.getElementById('submitBtn') || document.querySelector('.submit-btn');
 let btnText = document.getElementById('btnText');
 
+// ===== ADDED: Date restriction function =====
+function initializeDateRestrictions() {
+  const dateInput = document.getElementById('preferred');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+    
+    // Optional: Add validation to prevent past dates
+    dateInput.addEventListener('change', function() {
+      if (this.value < today) {
+        alert('Please select today\'s date or a future date');
+        this.value = '';
+      }
+    });
+  }
+}
+// ===== END ADDED CODE =====
+
 // If there is no explicit btnText element, we'll update the button text itself
 function setButtonText(txt) {
   if (btnText) {
@@ -91,6 +109,10 @@ onAuthStateChanged(auth, async (user) => {
     window.location.replace('login.html');
     return;
   }
+
+  // ===== ADDED: Initialize date restrictions =====
+  initializeDateRestrictions();
+  // ===== END ADDED CODE =====
 
   // prefer users collection fields: firstName + surname OR displayName
   try {
@@ -153,6 +175,13 @@ if (form) {
       const vehicleMake = makeInput ? makeInput.value.trim() : '';
       const vehicleModel = modelInput ? modelInput.value.trim() : '';
       const mileageRaw = mileageInput ? mileageInput.value.replace(/,/g, '').trim() : '';
+
+      // ===== ADDED: Enhanced date validation =====
+      const today = new Date().toISOString().split('T')[0];
+      if (preferredRaw < today) {
+        throw new Error('Please select today\'s date or a future date.');
+      }
+      // ===== END ADDED CODE =====
 
       // basic validation
       if (!isFilled(preferredRaw) || !isFilled(serviceVal) || (serviceVal === 'other' && !isFilled(otherVal))

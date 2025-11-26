@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Invoice — Al's Auto</title>
+  <link rel="icon" href="img/alsauto.ico" />
+  <link rel="stylesheet" href="create-invoice.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <main class="card">
+    <header class="ci-header">
+      <div>
+        <h1>Create Quotes</h1>
+        <div id="bookingInfo" class="muted">Loading Quotes...</div>
+      </div>
+      <div class="actions">
+        <a id="backBtn" class="btn small" href="admin-dashboard.html"><i class="fas fa-arrow-left"></i> Back</a>
+        <button id="signOutBtn" class="btn small">Sign out</button>
+      </div>
+    </header>
+
+    <section id="mainArea">
+      <div id="alert" class="notification" hidden></div>
+
+      <form id="quoteForm" class="card-group">
+        <fieldset class="card">
+          <legend>Customer & Booking</legend>
+          <div class="row">
+            <label>Name
+              <input id="custName" readonly>
+            </label>
+            <label>Surname
+              <input id="custSurname" readonly>
+            </label>
+
+            <label>Email
+              <input id="custEmail" readonly>
+            </label>
+          </div>
+          <div class="row">
+            
+            <label>Service
+              <input id="serviceType" readonly>
+            </label>
+            <label>Vehicle
+              <input id="vehicle" readonly>
+            </label>
+          </div>
+          
+            
+           
+          </div>
+        </fieldset>
+
+        <fieldset class="card">
+          <legend>Line Items</legend>
+          <table id="itemsTable" class="items-table" aria-live="polite">
+            <thead>
+              <tr>
+                <th style="width:48%">Description</th>
+                <th style="width:12%">Qty</th>
+                <th style="width:20%">Unit Price</th>
+                <th style="width:12%">Line Total</th>
+                <th style="width:8%"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div style="margin-top:12px;">
+            <button type="button" id="addRow" class="btn">+ Add line</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="card totals">
+          <legend>Totals</legend>
+          <div class="row">
+            <label>Subtotal
+              <input id="subtotal" readonly>
+            </label>
+            <label>Tax % 
+              <input id="taxRate" type="number" min="0" value="0">
+            </label>
+          </div>
+          <div class="row">
+            <label>Tax amount
+              <input id="taxAmount" readonly>
+            </label>
+            <label>Total
+              <input id="grandTotal" readonly>
+            </label>
+          </div>
+
+         
+
+          <div class="form-actions">
+            <button id="saveInvoice" class="btn primary" type="button"><i class="fas fa-file-invoice"></i> Create Quote</button>
+            <button id="previewBtn" class="btn" type="button"><i class="fas fa-eye"></i> Preview</button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="create-quote.js"></script>
+</body>
+</html>

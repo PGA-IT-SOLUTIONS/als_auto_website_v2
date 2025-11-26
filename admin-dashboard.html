@@ -48,6 +48,30 @@
       </div>
     </div>
 
+    <div class="section">
+<h2>Quotes</h2>
+<div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+<label class="muted" style="margin:0;">Filter:</label>
+<select id="quotesFilter">
+<option value="all" selected>All</option>
+<option value="recent">Recent (30 days)</option>
+</select>
+<div style="margin-left:auto;" id="quotesCount" class="muted">—</div>
+</div>
+
+
+<div id="quotesList" aria-live="polite">
+<div class="empty">Loading quotes <span class="small-spinner" aria-hidden></span></div>
+</div>
+</div>
+    <section class="section">
+      <h2>Invoices</h2>
+      <div id="invoicesSummary" class="muted">Invoices</div>
+      <div id="invoicesCount" class="muted" style="margin-bottom:8px"></div>
+      <div id="invoicesList" aria-live="polite"></div>
+    </section>
+    
+
   </main>
 
   <script type="module" src="admin.js"></script>
