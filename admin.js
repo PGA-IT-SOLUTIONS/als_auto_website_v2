@@ -15,6 +15,7 @@ import {
   where,
   limit
 } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-functions.js';
 
 // firebase config (same as other pages)
 const firebaseConfig = {
@@ -30,6 +31,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functionsClient = getFunctions(app);
 
 // DOM
 const userInfoEl = document.getElementById('userInfo');
@@ -43,8 +45,14 @@ const signOutBtn = document.getElementById('signOutBtn');
 const invoicesListEl = document.getElementById('invoicesList');
 const invoicesCountEl = document.getElementById('invoicesCount');
 
+// QUOTES DOM (new)
+const quotesListEl = document.getElementById('quotesList');
+const quotesCountEl = document.getElementById('quotesCount');
+const quotesFilter = document.getElementById('quotesFilter');
+
 let bookingsUnsub = null;
 let invoicesUnsub = null;
+let quotesUnsub = null;
 let currentAdminUid = null;
 
 // Workflow status constants (DB values)
@@ -76,6 +84,31 @@ function statusBadge(status){
   };
   return map[status] || `<span class="badge">${status}</span>`;
 }
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>\"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+}
+
+// load a script by URL (simple singleton loader)
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[data-src="${src}"]`) || document.querySelector(`script[src="${src}"]`)) {
+      return setTimeout(resolve, 20);
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.setAttribute('data-src', src);
+    s.onload = () => resolve();
+    s.onerror = (e) => reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+// currency helper
+function fmtCurrency(n = 0) {
+  return `R ${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
 // Render admins list
 async function loadAdmins(){
@@ -90,11 +123,11 @@ async function loadAdmins(){
       const row = document.createElement('div');
       row.className = 'admin-item';
       row.innerHTML = `<div>
-          <div style="font-weight:600;color:#0f172a">${data.email || d.id}</div>
-          <div class="admin-meta">UID: ${d.id}</div>
+          <div style="font-weight:600;color:#0f172a">${escapeHtml(data.email || d.id)}</div>
+          <div class="admin-meta">UID: ${escapeHtml(d.id)}</div>
         </div>
         <div style="text-align:right">
-          <div class="admin-meta">${data.role || 'admin'}</div>
+          <div class="admin-meta">${escapeHtml(data.role || 'admin')}</div>
           <div class="muted">${data.createdAt ? formatDate(data.createdAt) : ''}</div>
         </div>`;
       adminsListEl.appendChild(row);
@@ -143,14 +176,14 @@ function renderBookings(items){
       <div style="flex:1">
         <div style="display:flex; gap:12px; align-items:center;">
           <div style="min-width:200px">
-            <div style="font-weight:700;color:#0f172a">${b.userName || b.userEmail || b.userId}</div>
-            <div class="admin-meta">Email: ${b.userEmail || '—'}</div>
-            <div class="admin-meta">Phone: ${b.userPhone || '—'}</div>
+            <div style="font-weight:700;color:#0f172a">${escapeHtml(b.userName || b.userEmail || b.userId)}</div>
+            <div class="admin-meta">Email: ${escapeHtml(b.userEmail || '—')}</div>
+            <div class="admin-meta">Phone: ${escapeHtml(b.userPhone || '—')}</div>
           </div>
           <div style="min-width:180px">
-            <div><strong>Service:</strong> ${b.serviceType}${b.otherService ? ` — ${b.otherService}` : ''}</div>
-            <div><strong>Date:</strong> ${b.preferredDateString || formatDate(b.preferredDate)}</div>
-            <div><strong>Vehicle:</strong> ${b.vehicleMake || ''} ${b.vehicleModel || ''}</div>
+            <div><strong>Service:</strong> ${escapeHtml(b.serviceType)}${b.otherService ? ` — ${escapeHtml(b.otherService)}` : ''}</div>
+            <div><strong>Date:</strong> ${escapeHtml(b.preferredDateString || formatDate(b.preferredDate))}</div>
+            <div><strong>Vehicle:</strong> ${escapeHtml(b.vehicleMake || '')} ${escapeHtml(b.vehicleModel || '')}</div>
             <div class="admin-meta">Mileage: ${b.mileage ?? '—'}</div>
           </div>
         </div>
@@ -165,7 +198,7 @@ function renderBookings(items){
           ${(!invoiceExists && b.status === STATUS.COMPLETE) ? `<button class="btn action-invoice" data-id="${b.id}">Create Invoice</button>` : ''}
           ${ (b.status === STATUS.COMPLETE) ? `<button class="btn action-view-invoice" data-invoice-id="${b.invoiceId || ''}" data-booking-id="${b.id}">View Invoice</button>` : ''}
         </div>
-        <div class="muted" style="margin-top:8px">ID: ${b.id}</div>
+        <div class="muted" style="margin-top:8px">ID: ${escapeHtml(b.id)}</div>
       </div>
     `;
     bookingsListEl.appendChild(el);
@@ -256,8 +289,8 @@ function renderInvoices(items){
 
     el.innerHTML = `
       <div style="flex:1">
-        <div style="font-weight:700;color:#0f172a">${(inv.customer && inv.customer.name) ? inv.customer.name : (inv.customer && inv.customer.email) || inv.bookingId}</div>
-        <div class="admin-meta">Booking: ${inv.bookingId || '—'}</div>
+        <div style="font-weight:700;color:#0f172a">${(inv.customer && inv.customer.name) ? escapeHtml(inv.customer.name) : (inv.customer && inv.customer.email) || escapeHtml(inv.bookingId)}</div>
+        <div class="admin-meta">Booking: ${escapeHtml(inv.bookingId || '—')}</div>
         <div class="admin-meta">Total: ${inv.total !== undefined ? Number(inv.total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</div>
       </div>
       <div style="text-align:right; min-width:200px;">
@@ -267,7 +300,7 @@ function renderInvoices(items){
           <button class="btn action-notpaid" data-id="${inv.id}">Not paid</button>
           <button class="btn action-view-inv" data-id="${inv.id}">View Invoice</button>
         </div>
-        <div class="muted" style="margin-top:8px">ID: ${inv.id}</div>
+        <div class="muted" style="margin-top:8px">ID: ${escapeHtml(inv.id)}</div>
       </div>
     `;
     invoicesListEl.appendChild(el);
@@ -321,6 +354,300 @@ function renderInvoices(items){
   });
 }
 
+// --------- QUOTES: listen + render (new) ---------
+function listenQuotes(){
+  if (!quotesListEl) return;
+  if (quotesUnsub) quotesUnsub();
+
+  const filter = quotesFilter?.value || 'all';
+  let q;
+  if (filter === 'recent') {
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+    q = query(collection(db, 'quotes'), where('createdAt', '>=', since), orderBy('createdAt', 'desc'));
+  } else {
+    q = query(collection(db, 'quotes'), orderBy('createdAt', 'desc'));
+  }
+
+  quotesUnsub = onSnapshot(q, (snap) => {
+    const items = [];
+    snap.forEach(s => items.push({ id: s.id, ...s.data() }));
+    renderQuotes(items);
+  }, (err) => {
+    console.error('quotes snapshot error', err);
+    renderEmpty(quotesListEl, 'Failed to load quotes.');
+    if (quotesCountEl) quotesCountEl.textContent = '—';
+  });
+}
+
+function renderQuotes(items){
+  if (!quotesListEl) return;
+  quotesListEl.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    renderEmpty(quotesListEl, 'No quotes found.');
+    if (quotesCountEl) quotesCountEl.textContent = '0';
+    return;
+  }
+
+  // Update count
+  if (quotesCountEl) quotesCountEl.textContent = String(items.length);
+
+  // Render each quote using same two-column pattern as bookings
+  for (const q of items) {
+    const el = document.createElement('div');
+    el.className = 'admin-item quote-item';
+    const dateStr = q.createdAt ? formatDate(q.createdAt) : '—';
+
+    // Determine if a formal quote has already been created for this request
+    const hasQuote = !!(q.quoteId || q.quoteCreated);
+    const quoteId = q.quoteId || '';
+
+    el.innerHTML = `
+      <div style="flex:1">
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div style="min-width:200px">
+            <div style="font-weight:700;color:#0f172a">${escapeHtml(q.name)} ${escapeHtml(q.surname)}</div>
+            <div class="admin-meta">Email: ${escapeHtml(q.email || '—')}</div>
+          </div>
+
+          <div style="min-width:220px">
+            <div><strong>Vehicle:</strong> ${escapeHtml(q.make || '—')} ${escapeHtml(q.model || '')}</div>
+            <div><strong>Service:</strong> ${escapeHtml(q.serviceType || '—')}${q.otherService ? ' — ' + escapeHtml(q.otherService) : ''}</div>
+            <div class="admin-meta">Requested: ${escapeHtml(dateStr)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:right; min-width:200px">
+        <div style="margin-bottom:10px">
+          ${hasQuote ? '<span class="badge quote-created">Quote Created</span>' : ''}
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
+          ${hasQuote
+            ? `<button class="btn action-view-quote" data-quote-id="${escapeHtml(quoteId)}" data-id="${escapeHtml(q.id)}">View Quote</button>
+               <button class="btn action-download-quote" data-quote-id="${escapeHtml(quoteId)}" data-id="${escapeHtml(q.id)}">Download</button>`
+            : `<button class="btn action-create-quote" data-id="${escapeHtml(q.id)}">Create Quote</button>`
+          }
+        </div>
+
+        <div class="muted" style="margin-top:8px">ID: ${escapeHtml(q.id)}</div>
+      </div>
+    `;
+
+    quotesListEl.appendChild(el);
+  }
+
+  // attach handlers
+  Array.from(quotesListEl.querySelectorAll('.action-create-quote')).forEach(btn=>{
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      if (!id) return;
+      // open create-quote page in new tab, provide the request id so it can pre-fill
+      window.open(`create-quote.html?requestId=${encodeURIComponent(id)}`, '_blank');
+    });
+  });
+
+  Array.from(quotesListEl.querySelectorAll('.action-view-quote')).forEach(btn=>{
+    btn.addEventListener('click', () => {
+      const qid = (btn.dataset.quoteId || '').trim();
+      const requestId = btn.dataset.id;
+      if (qid) {
+        window.open(`quote-view.html?quoteId=${encodeURIComponent(qid)}`, '_blank');
+      } else if (requestId) {
+        // fallback: open a page that can fetch by request id
+        window.open(`quote-view.html?requestId=${encodeURIComponent(requestId)}`, '_blank');
+      }
+    });
+  });
+
+  // Attach download handlers for quotes
+  Array.from(quotesListEl.querySelectorAll('.action-download-quote')).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const quoteId = (btn.dataset.quoteId || '').trim();
+      const requestId = (btn.dataset.id || '').trim();
+      const fetchId = quoteId || requestId;
+      if (!fetchId) return;
+      const originalText = btn.textContent;
+      try {
+        btn.disabled = true;
+        btn.textContent = 'Generating PDF...';
+
+        // Prefer officialQuotes/{quoteId} if quoteId present
+        let snapshot;
+        if (quoteId) {
+          const qRef = doc(db, 'officialQuotes', quoteId);
+          snapshot = await getDoc(qRef);
+        } else {
+          const qRef = doc(db, 'quotes', requestId);
+          snapshot = await getDoc(qRef);
+        }
+
+        if (!snapshot || !snapshot.exists()) {
+          alert('Quote document not found.');
+          btn.disabled = false;
+          btn.textContent = originalText;
+          return;
+        }
+
+        const data = snapshot.data();
+
+        // Load libraries
+        await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+        await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js');
+
+        const { jsPDF } = window.jspdf;
+        const docPdf = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pageWidth = docPdf.internal.pageSize.getWidth();
+        const margin = 40;
+        let y = margin;
+
+        // Header - Match invoice-view styling
+        docPdf.setFontSize(18);
+        docPdf.setTextColor('#08417a');
+        docPdf.text('ALS Auto Services — Quote', margin, y);
+        
+        // Company info (right aligned like invoice-view)
+        docPdf.setFontSize(10);
+        const companyLines = [
+          'ALS Auto Services',
+          '34a Central Avenue, Eastleigh, Edenvale',
+          'Phone: +27 073 299 2009',
+          'Email: allwynsewell@gmail.com'
+        ];
+        const rightX = pageWidth - margin;
+        companyLines.forEach((line, i) => {
+          docPdf.text(line, rightX, y + (i * 12), { align: 'right' });
+        });
+        y += 28;
+
+        // Meta information
+        docPdf.setFontSize(11);
+        docPdf.setTextColor(40);
+        docPdf.text(`Quote ID: ${fetchId}`, margin, y);
+        const createdAt = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleString() : String(data.createdAt)) : '—';
+        docPdf.text(`Created: ${createdAt}`, margin + 260, y);
+        y += 20;
+
+        // Separator line
+        docPdf.setDrawColor(230);
+        docPdf.setLineWidth(0.5);
+        docPdf.line(margin, y, pageWidth - margin, y);
+        y += 14;
+
+        // Customer block
+        docPdf.setFontSize(12);
+        docPdf.setTextColor(30);
+        docPdf.text('Customer / Account', margin, y);
+        y += 14;
+        docPdf.setFontSize(10);
+        const custName = (data.customer && data.customer.name) ? data.customer.name : (data.name || `${data.name || ''} ${data.surname || ''}`.trim() || '—');
+        const custEmail = (data.customer && data.customer.email) ? data.customer.email : (data.email || '—');
+        const custPhone = (data.customer && data.customer.phone) ? data.customer.phone : '—';
+        docPdf.text(`Name: ${custName}`, margin, y);
+        docPdf.text(`Email: ${custEmail}`, margin + 260, y);
+        y += 14;
+        if (custPhone !== '—') {
+          docPdf.text(`Phone: ${custPhone}`, margin, y);
+          y += 18;
+        } else {
+          y += 4;
+        }
+
+        // Vehicle & service
+        docPdf.setFontSize(12);
+        docPdf.text('Vehicle & Service', margin, y);
+        y += 14;
+        docPdf.setFontSize(10);
+        const vehicle = `${data.vehicleMake || data.make || ''} ${data.vehicleModel || data.model || ''}`.trim() || '—';
+        const service = `${data.serviceType || ''}${data.otherService ? ' — ' + (data.otherService || '') : ''}`;
+        docPdf.text(`Vehicle: ${vehicle}`, margin, y);
+        docPdf.text(`Service: ${service}`, margin + 260, y);
+        y += 22;
+
+        // Items table (if present)
+        const items = Array.isArray(data.items) ? data.items : (data.items || []);
+        if (items.length) {
+          const tableBody = items.map(it => [
+            it.description || '',
+            it.qty || 0,
+            Number(it.unit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(it.lineTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          ]);
+
+          docPdf.autoTable({
+            startY: y,
+            head: [['Description','Qty','Unit (R)','Price (R)']],
+            body: tableBody,
+            margin: { left: margin, right: margin },
+            styles: { fontSize: 10, cellPadding: 6 },
+            headStyles: { fillColor: [245,245,245], textColor: 20, fontStyle: 'bold' },
+            columnStyles: {
+              1: { halign: 'center', cellWidth: 40 },
+              2: { halign: 'right', cellWidth: 80 },
+              3: { halign: 'right', cellWidth: 90 }
+            }
+          });
+          y = docPdf.lastAutoTable ? docPdf.lastAutoTable.finalY + 10 : (y + 120);
+        }
+
+        // Totals if present
+        if (data.subtotal !== undefined || data.total !== undefined) {
+          const totalsX = pageWidth - margin - 240;
+          docPdf.setFontSize(10);
+          docPdf.text('Subtotal:', totalsX, y);
+          docPdf.text(fmtCurrency(data.subtotal || 0), pageWidth - margin, y, { align: 'right' });
+          y += 14;
+          docPdf.text('Tax:', totalsX, y);
+          docPdf.text(fmtCurrency(data.taxAmount || 0), pageWidth - margin, y, { align: 'right' });
+          y += 14;
+          docPdf.setFontSize(12);
+          docPdf.setFont(undefined, 'bold');
+          docPdf.text('Total:', totalsX, y);
+          docPdf.text(fmtCurrency(data.total || 0), pageWidth - margin, y, { align: 'right' });
+          y += 22;
+        }
+
+        // Notes (if any)
+        if (data.notes) {
+          docPdf.setFontSize(11);
+          docPdf.setFont(undefined, 'normal');
+          docPdf.text('Notes', margin, y);
+          y += 12;
+          docPdf.setFontSize(10);
+          const notesLines = docPdf.splitTextToSize(String(data.notes || ''), pageWidth - margin * 2);
+          docPdf.text(notesLines, margin, y);
+          y += (notesLines.length * 12) + 8;
+        }
+
+        // Footer info
+        const createdBy = data.createdBy || '—';
+        const updatedAt = data.updatedAt ? (data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString() : String(data.updatedAt)) : '—';
+        docPdf.setFontSize(9);
+        docPdf.setTextColor(110);
+        docPdf.text(`Created by: ${createdBy}`, margin, docPdf.internal.pageSize.getHeight() - 60);
+        docPdf.text(`Updated: ${updatedAt}`, margin + 200, docPdf.internal.pageSize.getHeight() - 60);
+
+        // Trigger download
+        const filename = quoteId ? `quote-${quoteId}.pdf` : `quote-request-${requestId}.pdf`;
+        docPdf.save(filename);
+
+        btn.textContent = 'Downloaded';
+      } catch (err) {
+        console.error('Quote PDF generation failed', err);
+        alert('Failed to generate PDF. See console for details.');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+  });
+}
+
+// ---------------------- end quotes section ----------------------
+
+// INVOICES section listener already present above
+
 async function handleUpdateStatus(bookingId, newStatus, btn){
   if (!bookingId) return;
   const labelMap = {
@@ -371,6 +698,9 @@ onAuthStateChanged(auth, async (user) => {
     listenBookings();
     listenInvoices();
 
+    // start quotes listener (new)
+    listenQuotes();
+
   } catch (err) {
     console.error('admin auth check failed', err);
     await signOut(auth);
@@ -390,6 +720,11 @@ if (signOutBtn) {
 if (bookingFilter) {
   bookingFilter.addEventListener('change', () => {
     listenBookings();
+  });
+}
+if (quotesFilter) {
+  quotesFilter.addEventListener('change', () => {
+    listenQuotes();
   });
 }
 
